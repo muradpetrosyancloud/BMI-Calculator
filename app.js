@@ -227,7 +227,7 @@ const renderHTML = (content) => `
 // GET Route: Displays the calculator form
 app.get('/', (req, res) => {
     const formContent = `
-        <h1>Fitness & BMI Calculator</h1>
+        <h1>Fitness and BMI Calculator</h1>
         <p class="subtitle">Get your BMI, calorie needs, and ideal weight range</p>
         <form action="/calculate" method="POST">
  
