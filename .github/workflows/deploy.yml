@@ -1,0 +1,37 @@
+name: Automated Cloud Deployment
+
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Copy Files via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.GCP_VM_IP }}
+          username: ${{ secrets.GCP_VM_USERNAME }}
+          key: ${{ secrets.GCP_SSH_KEY }}
+          source: "app.js,Dockerfile,nginx.conf"
+          target: "/home/${{ secrets.GCP_VM_USERNAME }}/gym-dashboard"
+
+      - name: Execute Remote SSH Commands
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.GCP_VM_IP }}
+          username: ${{ secrets.GCP_VM_USERNAME }}
+          key: ${{ secrets.GCP_SSH_KEY }}
+          script: |
+            cd /home/${{ secrets.GCP_VM_USERNAME }}/gym-dashboard
+            sudo docker build -t fitness-app .
+            sudo docker stop gym-site || true
+            sudo docker rm gym-site || true
+            sudo docker run -d -p 5000:5000 --name gym-site fitness-app
+            sudo docker exec web-gateway nginx -s reload || true
