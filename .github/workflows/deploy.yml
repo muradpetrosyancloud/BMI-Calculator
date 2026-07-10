@@ -30,6 +30,7 @@ jobs:
           username: ${{ secrets.GCP_VM_USERNAME }}
           key: ${{ secrets.GCP_SSH_KEY }}
           script: |
+            set -e
             cd /home/${{ secrets.GCP_VM_USERNAME }}/gym-dashboard
             sudo docker build --no-cache -t fitness-app .
             sudo docker stop gym-site || true
